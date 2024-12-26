@@ -28,7 +28,7 @@ def signup(request):
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
-def login(request):
+def login(request): # 로그인
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -47,5 +47,18 @@ def login(request):
             return JsonResponse({'error':'이메일 또는 비밀번호가 올바르지 않습니다!!'}, status=400)
 
 
-def logout(request):
-    pass
+@api_view(["POST"])
+@authentication_classes([])      # 전역 인증 설정 무시
+@permission_classes([])  # 전역 IsAuthenticated 설정 무시
+def logout(request): # 로그아웃
+    print('---')
+    try:
+        refresh_token = request.data.get("refresh")
+        print(refresh_token)
+        token = RefreshToken(refresh_token)
+        print(token)
+        token.blacklist()
+        print('---')
+        return Response({"message": "로그아웃 성공"})
+    except Exception:
+        return Response({"error": "로그아웃 실패"}, status=status.HTTP_400_BAD_REQUEST)
