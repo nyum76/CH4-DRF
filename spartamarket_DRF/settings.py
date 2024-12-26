@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6a5_g2e6vh8*(3%v8b7mj#y2d_-y(b3&u3g!ba5d&49wvwtl3r'
+SECRET_KEY = 'django-insecure-6gua!cq*a5z)%_eh57qk4!rbv*spb*c9uz2o22^%(ktxf*hnz#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -26,13 +26,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # DRF
+     # DRF
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     
-    # apps
+    # my apps
     'accounts',
     'products',
+        
+    #더미 데이터 생성
+    'django_seed',
 ]
 
 MIDDLEWARE = [
@@ -117,3 +121,29 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# User 모델 설정
+AUTH_USER_MODEL = 'accounts.User'
+
+# JWT 인증
+REST_FRAMEWORK = {
+    # 모든 API에 인증을 필수로 하는 전역 설정
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# JWT 설정
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+
+# 미디어 파일 설정
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
