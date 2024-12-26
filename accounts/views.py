@@ -1,10 +1,14 @@
 from django.shortcuts import render
-from .serializers import SignupSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import (
+    SignupSerializer,
+    UserUpdateSerializer,
+    UserProfileSerializer,
+)
 
 from rest_framework.decorators import (
     api_view , # DRF 에서는 api_view 없으면 동작 안 함
@@ -62,3 +66,23 @@ def logout(request): # 로그아웃
         return Response({"message": "로그아웃 성공"})
     except Exception:
         return Response({"error": "로그아웃 실패"}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['GET', 'PUT', 'PATCH'])
+def profile(request):
+    user = request.user  # JWT 인증을 통해 얻은 현재 사용자
+    
+    if request.method == 'GET':
+        serializer = UserProfileSerializer(user, context={'request': request})
+        return Response(serializer.data, status=200)
+    
+    if request.method in ('PUT', 'PATCH') :
+        serializer = UserUpdateSerializer(instance=user, data=request.data, partial=True)  # partial=True로 일부 업데이트 허용
+
+        if serializer.is_valid():
+            serializer.save()  # 수정 내용 저장
+            return Response({
+                "message": "회원정보가 성공적으로 수정되었습니다.",
+                "user": serializer.data
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
