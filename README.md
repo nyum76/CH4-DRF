@@ -18,6 +18,8 @@
 DRF (Django REST Framework) 를 활용한 스파르타 마켓 백엔드 구현
 
 ## 초기 설정
+
+![](/image/settings.png)
 - [x] : `.gitignore` 설정
 - [X] : 가상환경 설정
 ```bash
@@ -46,6 +48,8 @@ python3 manage.py migrate
 
 ## ✨ 주요기능
 
+> 💡 **토글을 누르면 자세한 내용**을 볼 수 있어요 ! (`endpoint`, `HTTP method`)
+> 명세서 (CH4 발제 노션) 의 내용과 `endpoint` 가 다른 부분이 몇몇 존재
 
 ### 🧑‍💻 **회원 기능**
 
