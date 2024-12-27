@@ -147,3 +147,11 @@ SIMPLE_JWT = {
 # 미디어 파일 설정
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# 기본 캐시 설정 (로컬 메모리 캐시)
+
+CACHES = {
+    'default': {
+        'BACKEND':'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
