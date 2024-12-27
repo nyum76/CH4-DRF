@@ -21,7 +21,7 @@ from rest_framework.decorators import (
 @api_view(["POST"])
 @authentication_classes([]) # 전역 인증 설정 무시
 @permission_classes([]) # 전역 IsAuthenticated 설정 무시
-def signup(request):
+def signup(request): # 회원가입 기능
     serializer = SignupSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -34,7 +34,7 @@ def signup(request):
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
-def login(request): # 로그인
+def login(request): # 로그인 기능
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -56,7 +56,7 @@ def login(request): # 로그인
 @api_view(["POST"])
 @authentication_classes([])      # 전역 인증 설정 무시
 @permission_classes([])  # 전역 IsAuthenticated 설정 무시
-def logout(request): # 로그아웃
+def logout(request): # 로그아웃 기능
     print('---')
     try:
         refresh_token = request.data.get("refresh")
@@ -71,7 +71,7 @@ def logout(request): # 로그아웃
     
 
 @api_view(['GET', 'PUT', 'PATCH'])
-def profile(request):
+def profile(request): # 프로필 기능
     user = request.user  # JWT 인증을 통해 얻은 현재 사용자
     
     if request.method == 'GET': # 프로필 조회
@@ -92,7 +92,7 @@ def profile(request):
     
 
 @api_view(["POST"])
-def follow(request, user_pk):
+def follow(request, user_pk): # 팔로우 기능
     profile_user = get_object_or_404(User, pk=user_pk)
     me = request.user
 
