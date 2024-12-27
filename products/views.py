@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.views import APIView
 from .models import Product
 from .serializers import ProductListSerializer, ProductDetailSerializer
+from django.core.cache import cache
 
 
 class ProductListCreate(APIView):
@@ -38,6 +39,25 @@ class ProductDetail(APIView):
     def get(self, request, articleId): # 상품 상세 조회
         # 1. product pk 조회
         product = self.get_object(articleId)
+        
+        # 수정한 조회수
+        # 로그인한 사용자이고 작성자가 아닌 경우에만 조회수 증가 처리
+        # 24시간 동안 같은 IP에서 같은 게시글 조회 시 조회수가 증가하지 않음
+        if request.user != product.user:
+            # 해당 사용자의 IP와 게시글 ID로 캐시 키를 생성
+            cache_key = f"view_count_{request.META.get('REMOTE_ADDR')}_{articleId}"
+        
+            # 캐시에 없는 경우에만 조회수 증가
+            if not cache.get(cache_key):
+                product.view_count += 1
+                product.save()
+                # 캐시 저장 (24시간 유효)
+                cache.set(cache_key, True, 60*60*24)
+        
+        # 기존의 조회수
+        # product.view_count += 1
+        # product.save()
+        
         # 2. 직렬화
         serializer = ProductDetailSerializer(product)
         # 3. 반환

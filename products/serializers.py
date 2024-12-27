@@ -7,7 +7,8 @@ class ProductListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ('id','user', 'title', 'created_at')
+        fields = ('id','user', 'title', 'created_at', 'view_count') # 조회수 필드 추가
+        read_only_fields = ('user', )
 
 # 게시글 상세 조회 및 생성 Serializer
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -15,4 +16,4 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ('id', 'user', 'title', 'content', 'created_at', 'updated_at',)
+        fields = ('id', 'user', 'title', 'content', 'created_at', 'updated_at', 'view_count') # 조회수 필드 추가
