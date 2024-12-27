@@ -21,7 +21,8 @@ from rest_framework.decorators import (
 @api_view(["POST"])
 @authentication_classes([]) # 전역 인증 설정 무시
 @permission_classes([]) # 전역 IsAuthenticated 설정 무시
-def signup(request): # 회원가입 기능
+def signup(request):
+    '''회원 가입'''
     serializer = SignupSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -34,7 +35,8 @@ def signup(request): # 회원가입 기능
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
-def login(request): # 로그인 기능
+def login(request):
+    '''로그인'''
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -56,7 +58,8 @@ def login(request): # 로그인 기능
 @api_view(["POST"])
 @authentication_classes([])      # 전역 인증 설정 무시
 @permission_classes([])  # 전역 IsAuthenticated 설정 무시
-def logout(request): # 로그아웃 기능
+def logout(request):
+    '''로그아웃'''
     print('---')
     try:
         refresh_token = request.data.get("refresh")
@@ -71,14 +74,17 @@ def logout(request): # 로그아웃 기능
     
 
 @api_view(['GET', 'PUT', 'PATCH'])
-def profile(request): # 프로필 기능
+def profile(request):
+
     user = request.user  # JWT 인증을 통해 얻은 현재 사용자
     
-    if request.method == 'GET': # 프로필 조회
+    if request.method == 'GET':
+        '''프로필 조회'''
         serializer = UserProfileSerializer(user, context={'request': request})
         return Response(serializer.data, status=200)
     
-    if request.method in ('PUT', 'PATCH') : # 프로필 수정
+    if request.method in ('PUT', 'PATCH') :
+        '''프로필 수정'''
         serializer = UserUpdateSerializer(instance=user, data=request.data, partial=True)  # partial=True로 일부 업데이트 허용
 
         if serializer.is_valid():
@@ -88,11 +94,11 @@ def profile(request): # 프로필 기능
                 "user": serializer.data
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
 
 @api_view(["POST"])
-def follow(request, user_pk): # 팔로우 기능
+def follow(request, user_pk):
+    '''팔로우 기능'''
     profile_user = get_object_or_404(User, pk=user_pk)
     me = request.user
 
