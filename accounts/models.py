@@ -29,6 +29,7 @@ class User(AbstractUser):
         symmetrical=False,  # 대칭 관계가 아님 (단방향)
         related_name='followers',  # 역참조 이름
         through='Follow',  # 중간 테이블
+        blank=True, # seeding 할때 null 값이 포함되므로 지정해주기 (트러블 슈팅)
     )
     
     USERNAME_FIELD = 'email'    # 로그인 시 이메일 사용
@@ -38,7 +39,8 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.email
-    
+
+
 class Follow(models.Model):
     follower = models.ForeignKey(
         User, related_name='followed_users', on_delete=models.CASCADE)  # 팔로우를 하는 사용자
@@ -48,3 +50,6 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = ('follower', 'following')  # 중복 팔로우 방지
+        
+    def __str__(self):
+        return f"{self.follower} follows {self.following}"
