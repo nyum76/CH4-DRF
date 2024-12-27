@@ -32,21 +32,21 @@ class ProductDetail(APIView):
 
     # 일관되게 처리할 수 있도록 메서드 설정 (유효성 검증 로직 등에서,,,)
     # 개발 패턴중 하나임 ! -- > 확장성, 보완성, 유지 보수성 .. 등이 좋기에 사용함 (getter ?)
-    def get_object(self, articleId):
+    def get_object(self, productId):
         # pk 값이 없을 시 404 error 출력
-        return get_object_or_404(Product, pk=articleId)
+        return get_object_or_404(Product, pk=productId)
 
-    def get(self, request, articleId):
+    def get(self, request, productId):
         '''상품 상세 조회'''
         # 1. product pk 조회
-        product = self.get_object(articleId)
+        product = self.get_object(productId)
         
         # 수정한 조회수
         # 로그인한 사용자이고 작성자가 아닌 경우에만 조회수 증가 처리
         # 24시간 동안 같은 IP에서 같은 게시글 조회 시 조회수가 증가하지 않음
         if request.user != product.user:
             # 해당 사용자의 IP와 게시글 ID로 캐시 키를 생성
-            cache_key = f"view_count_{request.META.get('REMOTE_ADDR')}_{articleId}"
+            cache_key = f"view_count_{request.META.get('REMOTE_ADDR')}_{productId}"
         
             # 캐시에 없는 경우에만 조회수 증가
             if not cache.get(cache_key):
@@ -64,9 +64,9 @@ class ProductDetail(APIView):
         # 3. 반환
         return Response(serializer.data)
 
-    def put(self, request, articleId):
+    def put(self, request, productId):
         '''상품 수정'''
-        product = self.get_object(articleId)
+        product = self.get_object(productId)
         serializer = ProductDetailSerializer(
             product,
             data=request.data,
@@ -76,52 +76,46 @@ class ProductDetail(APIView):
             serializer.save()
             return Response(serializer.data)
 
-    def delete(self, request, articleId):
+    def delete(self, request, productId):
         '''상품 삭제'''
-        product = self.get_object(articleId)
+        product = self.get_object(productId)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CommentListCreate(APIView):
     '''댓글 CRUD'''
-    def get_product(self, articleId):
-        return get_object_or_404(Product, pk=articleId)
+    def get_product(self, productId):
+        return get_object_or_404(Product, pk=productId)
 
 
-    def get(self, request, articleId):
+    def get(self, request, productId):
         '''댓글 조회'''
-        product = self.get_product(articleId)
+        product = self.get_product(productId)
         comments = product.comments.all() # 역참조로 모든 댓글 가져오기
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-    def post(self, request, articleId):
+    def post(self, request, productId):
         '''댓글 생성'''
-        product = self.get_product(articleId)
+        product = self.get_product(productId)
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user, product=product)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, articleId):
-        '''댓글 삭제'''
-        product = self.get_product(articleId)
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CommentLike(APIView):
     '''댓글 좋아요 기능'''
-    def get_product(self, articleId):
-        return get_object_or_404(Product, pk=articleId)
+    def get_product(self, productId):
+        return get_object_or_404(Product, pk=productId)
     
     def get_comment(self, product, commentId):
         return get_object_or_404(Comment, pk=commentId, product=product)
 
-    def post(self, request, articleId, commentId):
-        product = self.get_product(articleId)
+    def post(self, request, productId, commentId):
+        product = self.get_product(productId)
         comment = self.get_comment(product, commentId)
         user = request.user
         
