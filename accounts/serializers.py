@@ -31,24 +31,20 @@ class SignupSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     profile_image = serializers.SerializerMethodField()
-    # class FollowSerializer(serializers.ModelSerializer):
-    #     class Meta:
-    #         model = User
-    #         fields = ['email', 'username', 'profile_image']  # 반환할 필드
+    class FollowSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = User
+            fields = ['email', 'username', 'profile_image']  # 반환할 필드
 
-    # followers = FollowSerializer(many=True, read_only=True)
-    # followings = FollowSerializer(many=True, read_only=True)
-    # follower_count = serializers.IntegerField(source='followers.count', read_only=True)
-    # following_count = serializers.IntegerField(source='following.count', read_only=True)
-    # profile_image = serializers.SerializerMethodField() # 커스텀 필드로 처리
-    
-    # class Meta:
-    #     model = User
-    #     fields = ['email','username','profile_image','followings','followers','follower_count','following_count'] # 반환할 필드
+    followers = FollowSerializer(many=True, read_only=True)
+    followings = FollowSerializer(many=True, read_only=True)
+    follower_count = serializers.IntegerField(source='followers.count', read_only=True)
+    following_count = serializers.IntegerField(source='following.count', read_only=True)
+    profile_image = serializers.SerializerMethodField() # 커스텀 필드로 처리
     
     class Meta:
         model = User
-        fields = ['email','username','profile_image'] # 반환할 필드
+        fields = ['email','username','profile_image','followings','followers','follower_count','following_count'] # 반환할 필드
     
     
     def get_profile_image(self, obj):
@@ -58,6 +54,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return None
 
 
+# 회원 정보 수정용 serializer
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

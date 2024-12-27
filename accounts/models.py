@@ -20,14 +20,31 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractUser):
     email = models.EmailField('이메일', unique=True)
-    # username 안쓰려면 None 값 줘도 됨
-    username = models.CharField('닉네임',max_length=150)
-    # 프로필 이미지는 필수는 아니므로 빈값과 null 허용
+    username = models.CharField('닉네임', max_length=150)  # unique=True 제거
     profile_image = models.ImageField('프로필 이미지', upload_to='profile_images/', blank=True, null=True)
     
-    USERNAME_FIELD = 'email' # 로그인시 필요한 필드 (username 이 기본값이지만, email 로 로그인 하도록 명시)
-    REQUIRED_FIELDS = [] # 필수 필드 정의 (email 필드는 자동으로 필수임)
+    # ManyToManyField로 팔로우 기능 구현
+    following = models.ManyToManyField(
+        'self',  # 자기 자신과의 관계
+        symmetrical=False,  # 대칭 관계가 아님 (단방향)
+        related_name='followers',  # 역참조 이름
+        through='Follow',  # 중간 테이블
+    )
     
-    objects = CustomUserManager() # manager 를 내가 커스텀한 CustomUserManager 로 사용하겠다
+    USERNAME_FIELD = 'email'    # 로그인 시 이메일 사용
+    REQUIRED_FIELDS = []        # email은 자동으로 필수
+
+    objects = CustomUserManager()
+    
     def __str__(self):
         return self.email
+    
+class Follow(models.Model):
+    follower = models.ForeignKey(
+        User, related_name='followed_users', on_delete=models.CASCADE)  # 팔로우를 하는 사용자
+    following = models.ForeignKey(
+        User, related_name='following_users', on_delete=models.CASCADE)  # 팔로우받는 사용자
+    created_at = models.DateTimeField(auto_now_add=True)  # 팔로우한 시간
+
+    class Meta:
+        unique_together = ('follower', 'following')  # 중복 팔로우 방지
