@@ -36,7 +36,7 @@ class ProductDetail(APIView):
         # pk 값이 없을 시 404 error 출력
         return get_object_or_404(Product, pk=articleId)
 
-    def get(self, request, articleId): 
+    def get(self, request, articleId):
         '''상품 상세 조회'''
         # 1. product pk 조회
         product = self.get_object(articleId)
@@ -75,28 +75,29 @@ class ProductDetail(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
-    
-    
+
     def delete(self, request, articleId):
         '''상품 삭제'''
         product = self.get_object(articleId)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class CommentListCreate(APIView):
 
+class CommentListCreate(APIView):
+    '''댓글 CRUD'''
     def get_product(self, articleId):
         return get_object_or_404(Product, pk=articleId)
-    
-    # 댓글 목록 조회
+
+
     def get(self, request, articleId):
+        '''댓글 조회'''
         product = self.get_product(articleId)
         comments = product.comments.all() # 역참조로 모든 댓글 가져오기
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-    # 댓글 생성
     def post(self, request, articleId):
+        '''댓글 생성'''
         product = self.get_product(articleId)
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
@@ -104,15 +105,15 @@ class CommentListCreate(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # 댓글 삭제
     def delete(self, request, articleId):
+        '''댓글 삭제'''
         product = self.get_product(articleId)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# 좋아요 생성 view 클래스
+
 class CommentLike(APIView):
-    
+    '''댓글 좋아요 기능'''
     def get_product(self, articleId):
         return get_object_or_404(Product, pk=articleId)
     
@@ -134,7 +135,7 @@ class CommentLike(APIView):
             comment.like_users.add(user)
             message = "댓글을 좋아요 했습니다."
 
-        # 댓글 정보를 시리얼라이저를 통해 반환
+        # 댓글 정보를 serializer를 통해 반환
         serializer = CommentSerializer(comment, context={'request': request})
         
         return Response({
