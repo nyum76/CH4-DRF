@@ -182,6 +182,8 @@ def profile(request):
 </div>
 </details>
 
+---
+
 
 ### 📋 **게시 기능**
 
@@ -317,6 +319,7 @@ class ProductDetail(APIView):
 </div>
 </details>
 
+---
 
 ### 💬 **댓글 기능**
 
